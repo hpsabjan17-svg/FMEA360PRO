@@ -1,1 +1,118 @@
-{% extends 'base.html' %}{% block title %}Register{% endblock %}{% block content %}<div class="auth"><div class="card authcard"><h1>Create Account</h1><p>Antolin Automotive FMEA workspace</p>{% if error %}<div class="err">{{error}}</div>{% endif %}<form method="post" onsubmit="return v()"><label>Name</label><input name="name" required><label>Organisation</label><input name="organisation" value="Antolin" required><label>Language</label><select name="language"><option>English</option><option>French</option><option>Spanish</option><option>German</option><option>Italian</option><option>Portuguese</option></select><label>Username</label><input name="username" required><label>Password</label><input id="p" type="password" name="password" required><small>Minimum 8 characters, 1 uppercase, 1 number and 1 special symbol.</small><label>Confirm Password</label><input id="cp" type="password" name="confirm_password" required><button class="primary full">Create Account</button></form><div class="links"><a href="{{url_for('login')}}">Already have an account? Sign in</a></div></div></div><script>function v(){let p=document.getElementById('p').value,c=document.getElementById('cp').value;if(p.length<8||!/[A-Z]/.test(p)||!/\d/.test(p)||!/[^A-Za-z0-9]/.test(p)){alert('Password must be at least 8 characters and contain 1 uppercase letter, 1 number and 1 special symbol.');return false}if(p!==c){alert('Passwords do not match.');return false}return true}</script>{% endblock %}
+{% extends 'base.html' %}
+
+{% block title %}Register{% endblock %}
+
+{% block content %}
+
+<div class="auth">
+    <div class="card authcard">
+
+        <h1>Create Account</h1>
+        <p>Antolin Automotive FMEA workspace</p>
+
+        {% if error %}
+        <div class="err">{{ error }}</div>
+        {% endif %}
+
+        <form method="post" onsubmit="return validateRegistration()">
+
+            <label>Name</label>
+            <input
+                type="text"
+                name="name"
+                placeholder="Enter your name"
+                required
+            >
+
+            <label>Organisation</label>
+            <input
+                type="text"
+                name="organisation"
+                placeholder="Enter organisation"
+                required
+            >
+
+            <label>Language</label>
+            <select name="language">
+                <option>English</option>
+                <option>French</option>
+                <option>Spanish</option>
+                <option>German</option>
+                <option>Italian</option>
+                <option>Portuguese</option>
+            </select>
+
+            <label>Username</label>
+            <input
+                type="text"
+                name="username"
+                placeholder="Choose a username"
+                required
+            >
+
+            <label>Password</label>
+            <input
+                id="p"
+                type="password"
+                name="password"
+                placeholder="Create password"
+                required
+            >
+
+            <small>
+                Minimum 8 characters, 1 uppercase letter,
+                1 number and 1 special symbol.
+            </small>
+
+            <label>Confirm Password</label>
+            <input
+                id="cp"
+                type="password"
+                name="confirm_password"
+                placeholder="Confirm password"
+                required
+            >
+
+            <button type="submit" class="primary full">
+                Create Account
+            </button>
+
+        </form>
+
+        <div class="links">
+            <a href="{{ url_for('login') }}">
+                Already have an account? Sign in
+            </a>
+        </div>
+
+    </div>
+</div>
+
+<script>
+function validateRegistration() {
+
+    const password = document.getElementById("p").value;
+    const confirmPassword = document.getElementById("cp").value;
+
+    if (
+        password.length < 8 ||
+        !/[A-Z]/.test(password) ||
+        !/\d/.test(password) ||
+        !/[^A-Za-z0-9]/.test(password)
+    ) {
+        alert(
+            "Password must be at least 8 characters and contain 1 uppercase letter, 1 number and 1 special symbol."
+        );
+        return false;
+    }
+
+    if (password !== confirmPassword) {
+        alert("Passwords do not match.");
+        return false;
+    }
+
+    return true;
+}
+</script>
+
+{% endblock %}
