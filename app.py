@@ -540,6 +540,103 @@ def register():
 
     return render_template("register.html", error=error)
 
+@app.route("/forgot-password", methods=["GET", "POST"])
+def forgot_password():
+    if session.get("user_id"):
+        return redirect(url_for("dashboard"))
+
+    error = None
+    success = None
+
+    if request.method == "POST":
+        username = request.form.get("username", "").strip()
+        new_password = request.form.get("new_password", "")
+        confirm_password = request.form.get("confirm_password", "")
+
+        if not username or not new_password or not confirm_password:
+            error = "Please fill in all fields."
+            return render_template(
+                "forgot_password.html",
+                error=error
+            )
+
+        if new_password != confirm_password:
+            error = "Passwords do not match."
+            return render_template(
+                "forgot_password.html",
+                error=error
+            )
+
+        if len(new_password) < 8:
+            error = "Password must contain at least 8 characters."
+            return render_template(
+                "forgot_password.html",
+                error=error
+            )
+
+        if not any(char.isupper() for char in new_password):
+            error = "Password must contain at least one uppercase letter."
+            return render_template(
+                "forgot_password.html",
+                error=error
+            )
+
+        if not any(char.isdigit() for char in new_password):
+            error = "Password must contain at least one number."
+            return render_template(
+                "forgot_password.html",
+                error=error
+            )
+
+        if not any(not char.isalnum() for char in new_password):
+            error = "Password must contain at least one special symbol."
+            return render_template(
+                "forgot_password.html",
+                error=error
+            )
+
+        conn = get_db()
+
+        user = conn.execute(
+            "SELECT id FROM users WHERE username = ?",
+            (username,)
+        ).fetchone()
+
+        if not user:
+            conn.close()
+            error = "Username not found."
+            return render_template(
+                "forgot_password.html",
+                error=error
+            )
+
+        conn.execute(
+            """
+            UPDATE users
+            SET password_hash = ?
+            WHERE id = ?
+            """,
+            (
+                generate_password_hash(new_password),
+                user["id"]
+            )
+        )
+
+        conn.commit()
+        conn.close()
+
+        success = "Password changed successfully. Please sign in."
+
+        return render_template(
+            "forgot_password.html",
+            success=success
+        )
+
+    return render_template(
+        "forgot_password.html",
+        error=error,
+        success=success
+    )
 
 @app.route("/logout")
 def logout():
